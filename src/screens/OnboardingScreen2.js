@@ -3,7 +3,7 @@ import { View, Text, Image, StyleSheet, Dimensions, TouchableOpacity, StatusBar,
 
 const { width } = Dimensions.get('window');
 
-const OnboardingScreen = ({ navigation }) => {
+const OnboardingScreen2 = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#ffffff" />
@@ -17,7 +17,7 @@ const OnboardingScreen = ({ navigation }) => {
             resizeMode="contain"
           />
           <Image 
-            source={require('../../assets/images/screen2/Event Home 1.png')} 
+            source={require('../../assets/images/screen3/Calendar Open View 1.png')} 
             style={styles.screenContent}
             resizeMode="cover"
           />
@@ -27,7 +27,7 @@ const OnboardingScreen = ({ navigation }) => {
       {/* Bottom Section - Blue Card */}
       <View style={styles.bottomSection}>
         <SafeAreaView>
-          <Text style={styles.title}>Explore Upcoming and{'\n'}Nearby Events</Text>
+          <Text style={styles.title}>Web Have Modern Events{'\n'}Calendar Feature</Text>
           <Text style={styles.subtitle}>
             In publishing and graphic design, Lorem is{'\n'}a placeholder text commonly
           </Text>
@@ -38,12 +38,12 @@ const OnboardingScreen = ({ navigation }) => {
             </TouchableOpacity>
 
             <View style={styles.pagination}>
-              <View style={[styles.dot, styles.activeDot]} />
               <View style={styles.dot} />
+              <View style={[styles.dot, styles.activeDot]} />
               <View style={styles.dot} />
             </View>
 
-            <TouchableOpacity onPress={() => navigation.navigate('Onboarding2')}>
+            <TouchableOpacity onPress={() => {}}>
               <Text style={styles.footerText}>Next</Text>
             </TouchableOpacity>
           </View>
@@ -134,4 +134,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default OnboardingScreen;
+export default OnboardingScreen2;
