@@ -6,19 +6,20 @@ import {
   Image, 
   TextInput, 
   TouchableOpacity, 
-  Switch, 
   SafeAreaView, 
   KeyboardAvoidingView, 
   Platform,
   ScrollView
 } from 'react-native';
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const LoginScreen = ({ navigation }) => {
+const RegisterScreen = ({ navigation }) => {
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [isRemember, setIsRemember] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -28,18 +29,27 @@ const LoginScreen = ({ navigation }) => {
       >
         <ScrollView contentContainerStyle={styles.container} showsVerticalScrollIndicator={false}>
           
-          {/* Logo Section */}
-          <View style={styles.logoContainer}>
-            <Image 
-              source={require('../../assets/images/common/logo.png')} 
-              style={styles.logoIcon}
-              resizeMode="contain"
-            />
-            <Text style={styles.logoText}>EventHub</Text>
+          {/* Header with Back Button */}
+          <View style={styles.header}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+              <MaterialCommunityIcons name="arrow-left" size={28} color="#120D26" />
+            </TouchableOpacity>
           </View>
 
-          {/* Sign In Title */}
-          <Text style={styles.title}>Sign in</Text>
+          {/* Sign Up Title */}
+          <Text style={styles.title}>Sign up</Text>
+
+          {/* Full Name Input */}
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons name="account-outline" size={24} color="#807A7A" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Full name"
+              placeholderTextColor="#9d9898"
+              value={fullName}
+              onChangeText={setFullName}
+            />
+          </View>
 
           {/* Email Input */}
           <View style={styles.inputContainer}>
@@ -75,28 +85,30 @@ const LoginScreen = ({ navigation }) => {
             </TouchableOpacity>
           </View>
 
-          {/* Remember Me & Forgot Password */}
-          <View style={styles.optionsContainer}>
-            <View style={styles.rememberContainer}>
-              <Switch
-                trackColor={{ false: "#E4DFDF", true: "#5669FF" }}
-                thumbColor={"#ffffff"}
-                ios_backgroundColor="#E4DFDF"
-                onValueChange={() => setIsRemember(!isRemember)}
-                value={isRemember}
-                style={{ transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }] }}
+          {/* Confirm Password Input */}
+          <View style={styles.inputContainer}>
+            <MaterialCommunityIcons name="lock-outline" size={24} color="#807A7A" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Confirm password"
+              placeholderTextColor="#9d9898"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              secureTextEntry={!showConfirmPassword}
+            />
+            <TouchableOpacity onPress={() => setShowConfirmPassword(!showConfirmPassword)} style={styles.eyeIcon}>
+              <MaterialCommunityIcons 
+                name={showConfirmPassword ? "eye-outline" : "eye-off-outline"} 
+                size={22} 
+                color="#807A7A" 
               />
-              <Text style={styles.rememberText}>Remember Me</Text>
-            </View>
-            <TouchableOpacity>
-              <Text style={styles.forgotText}>Forgot Password?</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Sign In Button */}
+          {/* Sign Up Button */}
           <TouchableOpacity style={styles.signInBtn} onPress={() => {}}>
             <View style={{ width: 30 }} /> 
-            <Text style={styles.signInText}>SIGN IN</Text>
+            <Text style={styles.signInText}>SIGN UP</Text>
             <View style={styles.arrowContainer}>
               <MaterialCommunityIcons name="arrow-right" size={20} color="#ffffff" />
             </View>
@@ -125,11 +137,11 @@ const LoginScreen = ({ navigation }) => {
             <Text style={styles.socialText}>Login with Facebook</Text>
           </TouchableOpacity>
 
-          {/* Sign Up Link */}
+          {/* Sign In Link */}
           <View style={styles.signUpContainer}>
-            <Text style={styles.noAccountText}>Don't have an account? </Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-              <Text style={styles.signUpText}>Sign up</Text>
+            <Text style={styles.noAccountText}>Already have an account? </Text>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+              <Text style={styles.signUpText}>Signin</Text>
             </TouchableOpacity>
           </View>
 
@@ -146,30 +158,25 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: 30,
-    paddingTop: 40,
+    paddingTop: 20,
     paddingBottom: 20,
     alignItems: 'center',
   },
-  logoContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
+  header: {
+    width: '100%',
+    alignItems: 'flex-start',
+    marginBottom: 20,
   },
-  logoIcon: {
-    width: 60,
-    height: 60,
-    marginBottom: 10,
-  },
-  logoText: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    color: '#37364A',
+  backButton: {
+    padding: 5,
+    marginLeft: -5,
   },
   title: {
     alignSelf: 'flex-start',
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#120D26',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   inputContainer: {
     flexDirection: 'row',
@@ -180,7 +187,7 @@ const styles = StyleSheet.create({
     borderColor: '#E4DFDF',
     borderRadius: 12,
     paddingHorizontal: 15,
-    marginBottom: 15,
+    marginBottom: 20,
   },
   inputIcon: {
     marginRight: 10,
@@ -193,26 +200,6 @@ const styles = StyleSheet.create({
   eyeIcon: {
     padding: 5,
   },
-  optionsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
-    marginBottom: 30,
-  },
-  rememberContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  rememberText: {
-    fontSize: 14,
-    color: '#120D26',
-    marginLeft: 5,
-  },
-  forgotText: {
-    fontSize: 14,
-    color: '#120D26',
-  },
   signInBtn: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -222,6 +209,7 @@ const styles = StyleSheet.create({
     height: 58,
     borderRadius: 15,
     paddingHorizontal: 20,
+    marginTop: 10,
     marginBottom: 30,
     shadowColor: '#5669FF',
     shadowOffset: { width: 0, height: 10 },
@@ -288,4 +276,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default LoginScreen;
+export default RegisterScreen;
