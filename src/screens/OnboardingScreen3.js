@@ -43,7 +43,7 @@ const OnboardingScreen3 = ({ navigation }) => {
               <View style={[styles.dot, styles.activeDot]} />
             </View>
 
-            <TouchableOpacity onPress={() => {}}>
+            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
               <Text style={styles.footerText}>Next</Text>
             </TouchableOpacity>
           </View>
