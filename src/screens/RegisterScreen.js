@@ -16,6 +16,8 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 const RegisterScreen = ({ navigation }) => {
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [countryCode, setCountryCode] = useState('+84');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -65,6 +67,41 @@ const RegisterScreen = ({ navigation }) => {
             />
           </View>
 
+          {/* Phone Input */}
+          <View style={styles.phoneContainer}>
+            <TouchableOpacity style={styles.countryPicker}>
+              <Image source={require('../../assets/images/screen5,6/Group 18559.png')} style={{width: 24, height: 24, display: 'none'}} /> 
+              {/* Note: I don't have flag images, so using just text */}
+              <View style={styles.flagPlaceholder}>
+                <Text style={styles.flagText}>🇻🇳</Text>
+              </View>
+              <Text style={styles.countryCodeText}>{countryCode}</Text>
+              <MaterialCommunityIcons name="chevron-down" size={20} color="#807A7A" />
+            </TouchableOpacity>
+            
+            <View style={styles.phoneDivider} />
+
+            <TextInput
+              style={styles.phoneInput}
+              placeholder="Your phone number"
+              placeholderTextColor="#9d9898"
+              value={phoneNumber}
+              onChangeText={(text) => {
+                // Simple formatting: keep only digits
+                const cleaned = text.replace(/\D/g, '');
+                // Format as XXX XXX XXXX
+                let formatted = cleaned;
+                if (cleaned.length > 3 && cleaned.length <= 6) {
+                  formatted = `${cleaned.slice(0, 3)} ${cleaned.slice(3)}`;
+                } else if (cleaned.length > 6) {
+                  formatted = `${cleaned.slice(0, 3)} ${cleaned.slice(3, 6)} ${cleaned.slice(6, 10)}`;
+                }
+                setPhoneNumber(formatted);
+              }}
+              keyboardType="phone-pad"
+            />
+          </View>
+
           {/* Password Input */}
           <View style={styles.inputContainer}>
             <MaterialCommunityIcons name="lock-outline" size={24} color="#807A7A" style={styles.inputIcon} />
@@ -106,7 +143,13 @@ const RegisterScreen = ({ navigation }) => {
           </View>
 
           {/* Sign Up Button */}
-          <TouchableOpacity style={styles.signInBtn} onPress={() => {}}>
+          <TouchableOpacity 
+            style={styles.signInBtn} 
+            onPress={() => {
+              const fullPhone = `${countryCode} ${phoneNumber}`;
+              navigation.navigate('Verification', { phoneNumber: fullPhone });
+            }}
+          >
             <View style={{ width: 30 }} /> 
             <Text style={styles.signInText}>SIGN UP</Text>
             <View style={styles.arrowContainer}>
@@ -196,6 +239,44 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: '#120D26',
+  },
+  phoneContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    width: '100%',
+    height: 56,
+    borderWidth: 1,
+    borderColor: '#E4DFDF',
+    borderRadius: 12,
+    marginBottom: 20,
+    backgroundColor: '#ffffff',
+  },
+  countryPicker: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 15,
+  },
+  flagPlaceholder: {
+    marginRight: 5,
+  },
+  flagText: {
+    fontSize: 16,
+  },
+  countryCodeText: {
+    fontSize: 16,
+    color: '#120D26',
+    marginRight: 2,
+  },
+  phoneDivider: {
+    width: 1,
+    height: 30,
+    backgroundColor: '#E4DFDF',
+  },
+  phoneInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#120D26',
+    paddingHorizontal: 15,
   },
   eyeIcon: {
     padding: 5,
