@@ -94,7 +94,10 @@ const LoginScreen = ({ navigation }) => {
           </View>
 
           {/* Sign In Button */}
-          <TouchableOpacity style={styles.signInBtn} onPress={() => {}}>
+          <TouchableOpacity 
+            style={styles.signInBtn} 
+            onPress={() => navigation.navigate('EventHome')}
+          >
             <View style={{ width: 30 }} /> 
             <Text style={styles.signInText}>SIGN IN</Text>
             <View style={styles.arrowContainer}>

@@ -9,6 +9,7 @@ import LoginScreen from './src/screens/LoginScreen';
 import RegisterScreen from './src/screens/RegisterScreen';
 import VerificationScreen from './src/screens/VerificationScreen';
 import ResetPasswordScreen from './src/screens/ResetPasswordScreen';
+import EventHomeScreen from './src/screens/EventHomeScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -24,6 +25,7 @@ export default function App() {
         <Stack.Screen name="Register" component={RegisterScreen} />
         <Stack.Screen name="Verification" component={VerificationScreen} />
         <Stack.Screen name="ResetPassword" component={ResetPasswordScreen} />
+        <Stack.Screen name="EventHome" component={EventHomeScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
