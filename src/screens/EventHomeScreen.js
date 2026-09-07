@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   View, 
   Text, 
@@ -9,13 +9,54 @@ import {
   Image,
   SafeAreaView,
   StatusBar,
-  Dimensions
+  Dimensions,
+  Animated,
+  Easing
 } from 'react-native';
 import { MaterialCommunityIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const EventHomeScreen = ({ navigation }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const animatedValue = useRef(new Animated.Value(0)).current;
+
+  const toggleMenu = () => {
+    const toValue = isMenuOpen ? 0 : 1;
+    Animated.timing(animatedValue, {
+      toValue,
+      duration: 300,
+      easing: Easing.inOut(Easing.ease),
+      useNativeDriver: true,
+    }).start();
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const scale = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [1, 0.75]
+  });
+
+  const translateX = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, width * 0.65]
+  });
+
+  const borderRadius = animatedValue.interpolate({
+    inputRange: [0, 1],
+    outputRange: [0, 35]
+  });
+
+  const menuItems = [
+    { icon: 'account-outline', title: 'My Profile' },
+    { icon: 'message-processing-outline', title: 'Message', badge: 3 },
+    { icon: 'calendar-month-outline', title: 'Calendar' },
+    { icon: 'bookmark-outline', title: 'Bookmark' },
+    { icon: 'email-outline', title: 'Contact Us' },
+    { icon: 'cog-outline', title: 'Settings' },
+    { icon: 'help-circle-outline', title: 'Helps & FAQs' },
+    { icon: 'logout', title: 'Sign Out', onPress: () => { toggleMenu(); navigation.navigate('Login'); } },
+  ];
 
   const categories = [
     { id: 1, name: 'Sports', icon: 'basketball-ball', color: '#F0635A' },
@@ -66,156 +107,302 @@ const EventHomeScreen = ({ navigation }) => {
   ];
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#4A43EC" />
+    <View style={styles.mainWrapper}>
+      <StatusBar barStyle={isMenuOpen ? "dark-content" : "light-content"} backgroundColor={isMenuOpen ? "#ffffff" : "#4A43EC"} />
       
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-        {/* TOP BLUE SECTION */}
-        <View style={styles.topSection}>
-          
-          {/* Header */}
-          <View style={styles.header}>
-            <TouchableOpacity>
-              <MaterialCommunityIcons name="menu" size={28} color="#ffffff" />
-            </TouchableOpacity>
-            
-            <View style={styles.locationContainer}>
-              <Text style={styles.currentLocation}>Current Location <MaterialCommunityIcons name="menu-down" size={16} color="#ffffff" /></Text>
-              <Text style={styles.locationText}>New Yourk, USA</Text>
-            </View>
-
-            <TouchableOpacity style={styles.notificationBtn}>
-              <MaterialCommunityIcons name="bell-outline" size={20} color="#ffffff" />
-              <View style={styles.notificationDot} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Search Bar */}
-          <View style={styles.searchContainer}>
-            <MaterialCommunityIcons name="magnify" size={24} color="#ffffff" style={styles.searchIcon} />
-            <View style={styles.divider} />
-            <TextInput 
-              style={styles.searchInput}
-              placeholder="Search..."
-              placeholderTextColor="#rgba(255, 255, 255, 0.5)"
-            />
-            <TouchableOpacity style={styles.filterBtn}>
-              <Ionicons name="options-outline" size={18} color="#ffffff" />
-              <Text style={styles.filterText}>Filters</Text>
-            </TouchableOpacity>
-          </View>
-
+      {/* MENU CONTENT (Background) */}
+      <View style={styles.menuContainer}>
+        <View style={styles.profileSection}>
+          <Image 
+            source={require('../../assets/images/screen10/avatar.jpg')} 
+            style={styles.profileAvatar} 
+          />
+          <Text style={styles.name}>Phuoc Quan</Text>
         </View>
 
-        {/* CATEGORIES SECTION (Overlapping) */}
-        <View style={styles.categoriesWrapper}>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesContainer}>
-            {categories.map((cat) => (
-              <TouchableOpacity key={cat.id} style={[styles.categoryBtn, { backgroundColor: cat.color }]}>
-                <FontAwesome5 name={cat.icon} size={16} color="#ffffff" />
-                <Text style={styles.categoryText}>{cat.name}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-
-        {/* UPCOMING EVENTS SECTION */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Upcoming Events</Text>
-          <TouchableOpacity style={styles.seeAllBtn}>
-            <Text style={styles.seeAllText}>See All</Text>
-            <MaterialCommunityIcons name="menu-right" size={20} color="#747688" />
-          </TouchableOpacity>
-        </View>
-
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.eventsContainer}>
-          {upcomingEvents.map((event) => (
-            <View key={event.id} style={styles.eventCard}>
-              <View style={styles.imageContainer}>
-                <Image source={event.image} style={styles.eventImage} resizeMode="cover" />
-                <View style={styles.dateBadge}>
-                  <Text style={styles.dateNumber}>{event.date}</Text>
-                  <Text style={styles.dateMonth}>{event.month}</Text>
+        <View style={styles.menuItemsContainer}>
+          {menuItems.map((item, index) => (
+            <TouchableOpacity 
+              key={index} 
+              style={styles.menuItem} 
+              onPress={item.onPress ? item.onPress : toggleMenu}
+            >
+              <MaterialCommunityIcons name={item.icon} size={24} color="#747688" style={styles.menuIcon} />
+              <Text style={styles.menuText}>{item.title}</Text>
+              
+              {item.badge && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{item.badge}</Text>
                 </View>
-                <TouchableOpacity style={styles.bookmarkBtn}>
-                  <MaterialCommunityIcons name="bookmark" size={18} color="#F0635A" />
-                </TouchableOpacity>
-              </View>
-              
-              <Text style={styles.eventTitle}>{event.title}</Text>
-              
-              <View style={styles.goingContainer}>
-                <View style={styles.avatarsWrapper}>
-                  {avatars.map((avatar, i) => (
-                    <Image key={i} source={avatar} style={[styles.avatar, { marginLeft: i > 0 ? -10 : 0, zIndex: 3 - i }]} />
-                  ))}
-                </View>
-                <Text style={styles.goingText}>+20 Going</Text>
-              </View>
-              
-              <View style={styles.locationWrapper}>
-                <MaterialCommunityIcons name="map-marker" size={16} color="#747688" />
-                <Text style={styles.locationDetail} numberOfLines={1}>{event.location}</Text>
-              </View>
-            </View>
+              )}
+            </TouchableOpacity>
           ))}
-        </ScrollView>
-
-        {/* INVITE BANNER */}
-        <View style={styles.bannerContainer}>
-          <View style={styles.bannerContent}>
-            <Text style={styles.bannerTitle}>Invite your friends</Text>
-            <Text style={styles.bannerSub}>Get $20 for ticket</Text>
-            <TouchableOpacity style={styles.inviteBtn}>
-              <Text style={styles.inviteText}>INVITE</Text>
-            </TouchableOpacity>
-          </View>
-          <Image source={require('../../assets/images/screen9/gift.png')} style={styles.giftImage} resizeMode="contain" />
         </View>
 
-        {/* NEARBY YOU SECTION */}
-        <View style={[styles.sectionHeader, { marginTop: 20 }]}>
-          <Text style={styles.sectionTitle}>Nearby You</Text>
-          <TouchableOpacity style={styles.seeAllBtn}>
-            <Text style={styles.seeAllText}>See All</Text>
-            <MaterialCommunityIcons name="menu-right" size={20} color="#747688" />
-          </TouchableOpacity>
-        </View>
-
-      </ScrollView>
-
-      {/* BOTTOM TAB BAR */}
-      <View style={styles.bottomTabBar}>
-        <TouchableOpacity style={styles.tabItem}>
-          <MaterialCommunityIcons name="compass" size={24} color="#4A43EC" />
-          <Text style={[styles.tabText, { color: '#4A43EC' }]}>Explore</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <MaterialCommunityIcons name="calendar-month" size={24} color="#dadada" />
-          <Text style={styles.tabText}>Events</Text>
-        </TouchableOpacity>
-        
-        <View style={styles.addBtnWrapper}>
-          <TouchableOpacity style={styles.addBtn}>
-            <MaterialCommunityIcons name="plus-box-outline" size={24} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
-        
-        <TouchableOpacity style={styles.tabItem}>
-          <MaterialCommunityIcons name="map-marker" size={24} color="#dadada" />
-          <Text style={styles.tabText}>Map</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.tabItem}>
-          <MaterialCommunityIcons name="account" size={24} color="#dadada" />
-          <Text style={styles.tabText}>Profile</Text>
+        <TouchableOpacity style={styles.upgradeBtn}>
+          <MaterialCommunityIcons name="crown" size={20} color="#00F8FF" />
+          <Text style={styles.upgradeText}>Upgrade Pro</Text>
         </TouchableOpacity>
       </View>
 
-    </SafeAreaView>
+      {/* FOREGROUND APP */}
+      <Animated.View style={[
+        styles.appContainer, 
+        { transform: [{ scale }, { translateX }], borderRadius }
+      ]}>
+        {isMenuOpen && <View style={styles.drawerShadow} />}
+        
+        <SafeAreaView style={styles.container}>
+          <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
+            {/* TOP BLUE SECTION */}
+            <View style={styles.topSection}>
+              
+              {/* Header */}
+              <View style={styles.header}>
+                <TouchableOpacity onPress={toggleMenu}>
+                  <MaterialCommunityIcons name="menu" size={28} color="#ffffff" />
+                </TouchableOpacity>
+                
+                <View style={styles.locationContainer}>
+                  <Text style={styles.currentLocation}>Current Location <MaterialCommunityIcons name="menu-down" size={16} color="#ffffff" /></Text>
+                  <Text style={styles.locationText}>New Yourk, USA</Text>
+                </View>
+
+                <TouchableOpacity style={styles.notificationBtn}>
+                  <MaterialCommunityIcons name="bell-outline" size={20} color="#ffffff" />
+                  <View style={styles.notificationDot} />
+                </TouchableOpacity>
+              </View>
+
+              {/* Search Bar */}
+              <View style={styles.searchContainer}>
+                <MaterialCommunityIcons name="magnify" size={24} color="#ffffff" style={styles.searchIcon} />
+                <View style={styles.divider} />
+                <TextInput 
+                  style={styles.searchInput}
+                  placeholder="Search..."
+                  placeholderTextColor="#rgba(255, 255, 255, 0.5)"
+                />
+                <TouchableOpacity style={styles.filterBtn}>
+                  <Ionicons name="options-outline" size={18} color="#ffffff" />
+                  <Text style={styles.filterText}>Filters</Text>
+                </TouchableOpacity>
+              </View>
+
+            </View>
+
+            {/* CATEGORIES SECTION (Overlapping) */}
+            <View style={styles.categoriesWrapper}>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoriesContainer}>
+                {categories.map((cat) => (
+                  <TouchableOpacity key={cat.id} style={[styles.categoryBtn, { backgroundColor: cat.color }]}>
+                    <FontAwesome5 name={cat.icon} size={16} color="#ffffff" />
+                    <Text style={styles.categoryText}>{cat.name}</Text>
+                  </TouchableOpacity>
+                ))}
+              </ScrollView>
+            </View>
+
+            {/* UPCOMING EVENTS SECTION */}
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Upcoming Events</Text>
+              <TouchableOpacity style={styles.seeAllBtn}>
+                <Text style={styles.seeAllText}>See All</Text>
+                <MaterialCommunityIcons name="menu-right" size={20} color="#747688" />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.eventsContainer}>
+              {upcomingEvents.map((event) => (
+                <View key={event.id} style={styles.eventCard}>
+                  <View style={styles.imageContainer}>
+                    <Image source={event.image} style={styles.eventImage} resizeMode="cover" />
+                    <View style={styles.dateBadge}>
+                      <Text style={styles.dateNumber}>{event.date}</Text>
+                      <Text style={styles.dateMonth}>{event.month}</Text>
+                    </View>
+                    <TouchableOpacity style={styles.bookmarkBtn}>
+                      <MaterialCommunityIcons name="bookmark" size={18} color="#F0635A" />
+                    </TouchableOpacity>
+                  </View>
+                  
+                  <Text style={styles.eventTitle}>{event.title}</Text>
+                  
+                  <View style={styles.goingContainer}>
+                    <View style={styles.avatarsWrapper}>
+                      {avatars.map((avatar, i) => (
+                        <Image key={i} source={avatar} style={[styles.avatar, { marginLeft: i > 0 ? -10 : 0, zIndex: 3 - i }]} />
+                      ))}
+                    </View>
+                    <Text style={styles.goingText}>+20 Going</Text>
+                  </View>
+                  
+                  <View style={styles.locationWrapper}>
+                    <MaterialCommunityIcons name="map-marker" size={16} color="#747688" />
+                    <Text style={styles.locationDetail} numberOfLines={1}>{event.location}</Text>
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+
+            {/* INVITE BANNER */}
+            <View style={styles.bannerContainer}>
+              <View style={styles.bannerContent}>
+                <Text style={styles.bannerTitle}>Invite your friends</Text>
+                <Text style={styles.bannerSub}>Get $20 for ticket</Text>
+                <TouchableOpacity style={styles.inviteBtn}>
+                  <Text style={styles.inviteText}>INVITE</Text>
+                </TouchableOpacity>
+              </View>
+              <Image source={require('../../assets/images/screen9/gift.png')} style={styles.giftImage} resizeMode="contain" />
+            </View>
+
+            {/* NEARBY YOU SECTION */}
+            <View style={[styles.sectionHeader, { marginTop: 20 }]}>
+              <Text style={styles.sectionTitle}>Nearby You</Text>
+              <TouchableOpacity style={styles.seeAllBtn}>
+                <Text style={styles.seeAllText}>See All</Text>
+                <MaterialCommunityIcons name="menu-right" size={20} color="#747688" />
+              </TouchableOpacity>
+            </View>
+
+          </ScrollView>
+
+          {/* BOTTOM TAB BAR */}
+          <View style={styles.bottomTabBar}>
+            <TouchableOpacity style={styles.tabItem}>
+              <MaterialCommunityIcons name="compass" size={24} color="#4A43EC" />
+              <Text style={[styles.tabText, { color: '#4A43EC' }]}>Explore</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.tabItem}>
+              <MaterialCommunityIcons name="calendar-month" size={24} color="#dadada" />
+              <Text style={styles.tabText}>Events</Text>
+            </TouchableOpacity>
+            
+            <View style={styles.addBtnWrapper}>
+              <TouchableOpacity style={styles.addBtn}>
+                <MaterialCommunityIcons name="plus-box-outline" size={24} color="#ffffff" />
+              </TouchableOpacity>
+            </View>
+            
+            <TouchableOpacity style={styles.tabItem}>
+              <MaterialCommunityIcons name="map-marker" size={24} color="#dadada" />
+              <Text style={styles.tabText}>Map</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.tabItem}>
+              <MaterialCommunityIcons name="account" size={24} color="#dadada" />
+              <Text style={styles.tabText}>Profile</Text>
+            </TouchableOpacity>
+          </View>
+
+        </SafeAreaView>
+
+        {isMenuOpen && (
+          <TouchableOpacity 
+            style={StyleSheet.absoluteFill} 
+            activeOpacity={1} 
+            onPress={toggleMenu} 
+          />
+        )}
+      </Animated.View>
+
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  mainWrapper: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  appContainer: {
+    flex: 1,
+    backgroundColor: '#FAFAFA',
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: -15, height: 0 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+    elevation: 15,
+  },
+  drawerShadow: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: -20,
+    width: 20,
+    backgroundColor: 'rgba(255, 255, 255, 0.5)',
+    zIndex: 10,
+  },
+  menuContainer: {
+    position: 'absolute',
+    top: 0,
+    bottom: 0,
+    left: 0,
+    width: width * 0.7,
+    paddingLeft: 40,
+    paddingTop: 60,
+  },
+  profileSection: {
+    marginTop: 20,
+    marginBottom: 40,
+  },
+  profileAvatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginBottom: 15,
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#120D26',
+  },
+  menuItemsContainer: {
+    flex: 1,
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 30,
+  },
+  menuIcon: {
+    width: 30,
+  },
+  menuText: {
+    fontSize: 16,
+    color: '#120D26',
+    marginLeft: 10,
+  },
+  badge: {
+    backgroundColor: '#F59762',
+    borderRadius: 10,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 10,
+  },
+  badgeText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontWeight: 'bold',
+  },
+  upgradeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 248, 255, 0.1)',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 12,
+    position: 'absolute',
+    bottom: 50,
+    left: 40,
+  },
+  upgradeText: {
+    color: '#00F8FF',
+    fontSize: 15,
+    fontWeight: 'bold',
+    marginLeft: 10,
+  },
   container: {
     flex: 1,
     backgroundColor: '#FAFAFA',
@@ -283,7 +470,7 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 20,
     color: '#ffffff',
-    padding: 0, // Remove default padding
+    padding: 0,
   },
   filterBtn: {
     flexDirection: 'row',
